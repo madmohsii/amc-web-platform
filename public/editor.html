@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur QCM AMC</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(45deg, #2c3e50, #3498db);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+        
+        .main-content {
+            padding: 40px;
+        }
+        
+        .form-section {
+            margin-bottom: 30px;
+            padding: 25px;
+            border: 2px solid #e8f4f8;
+            border-radius: 10px;
+            background: #f8fcff;
+        }
+        
+        .form-section h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .question-item {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .choice-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .choice-group input[type="text"] {
+            flex: 1;
+            margin-right: 10px;
+        }
+        
+        .choice-group input[type="checkbox"] {
+            width: auto;
+            margin-right: 10px;
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, #3498db, #2ecc71);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(45deg, #95a5a6, #7f8c8d);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+        }
+        
+        .btn-generate {
+            background: linear-gradient(45deg, #f39c12, #e67e22);
+            font-size: 18px;
+            padding: 15px 30px;
+            width: 100%;
+            margin-top: 20px;
+        }
+        
+        .question-counter {
+            background: #3498db;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎓 Générateur QCM AMC</h1>
+            <p>Créez facilement vos questionnaires à choix multiples au format LaTeX/AMC</p>
+        </div>
+        
+        <div class="main-content">
+            <form id="amcForm">
+                <!-- Informations générales -->
+                <div class="form-section">
+                    <h3>📋 Informations générales</h3>
+                    <div class="form-group">
+                        <label for="examTitle">Titre de l'examen :</label>
+                        <input type="text" id="examTitle" name="examTitle" placeholder="Ex: Examen de Mathématiques" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="examDate">Date :</label>
+                        <input type="date" id="examDate" name="examDate">
+                    </div>
+                    <div class="form-group">
+                        <label for="examDuration">Durée (minutes) :</label>
+                        <input type="number" id="examDuration" name="examDuration" placeholder="120" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="nbCopies">Nombre de copies :</label>
+                        <input type="number" id="nbCopies" name="nbCopies" value="30" min="1" required>
+                    </div>
+                </div>
+
+                <!-- Questions -->
+                <div class="form-section">
+                    <h3>❓ Questions</h3>
+                    <div id="questionsContainer">
+                        <!-- Les questions seront ajoutées dynamiquement ici -->
+                    </div>
+                    <button type="button" class="btn" onclick="addQuestion()">➕ Ajouter une question</button>
+                </div>
+
+                <!-- Options de génération -->
+                <div class="form-section">
+                    <h3>⚙️ Options de génération</h3>
+                    <div class="form-group">
+                        <label for="randomizeQuestions">
+                            <input type="checkbox" id="randomizeQuestions" name="randomizeQuestions" checked>
+                            Mélanger l'ordre des questions
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label for="randomizeChoices">
+                            <input type="checkbox" id="randomizeChoices" name="randomizeChoices" checked>
+                            Mélanger l'ordre des réponses
+                        </label>
+                    </div>
+                </div>
+
+                <button type="button" class="btn btn-generate" onclick="generateLaTeX()">
+                    🚀 Générer le fichier LaTeX
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let questionCount = 0;
+
+        function addQuestion() {
+            questionCount++;
+            const container = document.getElementById('questionsContainer');
+            
+            const questionDiv = document.createElement('div');
+            questionDiv.className = 'question-item';
+            questionDiv.innerHTML = `
+                <div class="question-counter">Question ${questionCount}</div>
+                <div class="form-group">
+                    <label>Énoncé de la question :</label>
+                    <textarea name="question_${questionCount}" placeholder="Tapez votre question ici..." required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Réponses (cochez les bonnes réponses) :</label>
+                    <div class="choices-container" id="choices_${questionCount}">
+                        <div class="choice-group">
+                            <input type="checkbox" name="correct_${questionCount}_1">
+                            <input type="text" name="choice_${questionCount}_1" placeholder="Réponse 1" required>
+                            <button type="button" class="btn btn-danger btn-sm" onclick="removeChoice(this)">❌</button>
+                        </div>
+                        <div class="choice-group">
+                            <input type="checkbox" name="correct_${questionCount}_2">
+                            <input type="text" name="choice_${questionCount}_2" placeholder="Réponse 2" required>
+                            <button type="button" class="btn btn-danger btn-sm" onclick="removeChoice(this)">❌</button>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-secondary" onclick="addChoice(${questionCount})">➕ Ajouter une réponse</button>
+                </div>
+                <button type="button" class="btn btn-danger" onclick="removeQuestion(this)">🗑️ Supprimer cette question</button>
+            `;
+            
+            container.appendChild(questionDiv);
+        }
+
+        function addChoice(questionId) {
+            const container = document.getElementById(`choices_${questionId}`);
+            const choiceCount = container.children.length + 1;
+            
+            const choiceDiv = document.createElement('div');
+            choiceDiv.className = 'choice-group';
+            choiceDiv.innerHTML = `
+                <input type="checkbox" name="correct_${questionId}_${choiceCount}">
+                <input type="text" name="choice_${questionId}_${choiceCount}" placeholder="Réponse ${choiceCount}" required>
+                <button type="button" class="btn btn-danger btn-sm" onclick="removeChoice(this)">❌</button>
+            `;
+            
+            container.appendChild(choiceDiv);
+        }
+
+        function removeChoice(button) {
+            button.parentElement.remove();
+        }
+
+        function removeQuestion(button) {
+            button.parentElement.remove();
+        }
+
+        function generateLaTeX() {
+            const formData = new FormData(document.getElementById('amcForm'));
+            
+            // Construire le code LaTeX
+            let latex = `\\documentclass[a4paper]{article}
+\\usepackage[utf8]{inputenc}
+\\usepackage[T1]{fontenc}
+\\usepackage[francais,bloc]{automultiplechoice}
+\\usepackage{geometry}
+\\geometry{margin=2cm}
+
+\\begin{document}
+
+\\noindent{\\bf ${formData.get('examTitle') || 'Examen'}
+\\hfill Date: ${formData.get('examDate') || '\\today'}}
+
+\\vspace{0.5cm}
+
+\\hrule
+\\vspace{0.3cm}
+
+Durée: ${formData.get('examDuration') || '120'} minutes
+
+\\vspace{0.5cm}
+
+`;
+
+            if (formData.get('randomizeQuestions')) {
+                latex += '\\AMCrandomseed{1237893}\n';
+            }
+
+            latex += `\\onecopy{${formData.get('nbCopies') || '30'}}{
+
+\\noindent\\hrulefill
+
+\\vspace{1cm}
+
+`;
+
+            // Traiter chaque question
+            const questions = document.querySelectorAll('.question-item');
+            questions.forEach((questionDiv, index) => {
+                const questionNumber = index + 1;
+                const questionText = questionDiv.querySelector(`textarea[name^="question_"]`).value;
+                
+                if (questionText.trim()) {
+                    latex += `  \\begin{questionmultx}{question${questionNumber}}\n`;
+                    latex += `    ${questionText}\n`;
+                    latex += `    \\begin{choices}\n`;
+                    
+                    // Traiter les choix
+                    const choices = questionDiv.querySelectorAll('.choice-group');
+                    choices.forEach((choiceDiv, choiceIndex) => {
+                        const choiceText = choiceDiv.querySelector('input[type="text"]').value;
+                        const isCorrect = choiceDiv.querySelector('input[type="checkbox"]').checked;
+                        
+                        if (choiceText.trim()) {
+                            if (isCorrect) {
+                                latex += `      \\correctchoice{${choiceText}}\n`;
+                            } else {
+                                latex += `      \\wrongchoice{${choiceText}}\n`;
+                            }
+                        }
+                    });
+                    
+                    latex += `    \\end{choices}\n`;
+                    latex += `  \\end{questionmultx}\n\n`;
+                }
+            });
+
+            latex += `}
+
+\\end{document}`;
+
+            // Afficher le résultat
+            showLaTeXResult(latex);
+        }
+
+        function showLaTeXResult(latex) {
+            const newWindow = window.open('', '_blank');
+            newWindow.document.write(`
+                <html>
+                <head>
+                    <title>Code LaTeX généré</title>
+                    <style>
+                        body { font-family: monospace; margin: 20px; }
+                        pre { background: #f5f5f5; padding: 20px; border-radius: 5px; overflow-x: auto; }
+                        .header { background: #3498db; color: white; padding: 15px; margin: -20px -20px 20px -20px; }
+                        .copy-btn { background: #2ecc71; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-bottom: 10px; }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <h2>Code LaTeX généré pour AMC</h2>
+                        <p>Copiez ce code dans un fichier .tex et compilez-le avec auto-multiple-choice</p>
+                    </div>
+                    <button class="copy-btn" onclick="copyToClipboard()">📋 Copier le code</button>
+                    <pre id="latexCode">${latex}</pre>
+                    <script>
+                        function copyToClipboard() {
+                            const code = document.getElementById('latexCode').textContent;
+                            navigator.clipboard.writeText(code).then(() => {
+                                alert('Code copié dans le presse-papier !');
+                            });
+                        }
+                    </script>
+                </body>
+                </html>
+            `);
+        }
+
+        // Ajouter une question par défaut au chargement
+        window.onload = function() {
+            addQuestion();
+        };
+    </script>
+</body>
+</html>
